@@ -8,7 +8,7 @@ interface VideoUploaderProps {
   onFileSelect: (file: File) => void;
 }
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 
 export function VideoUploader({ onFileSelect }: VideoUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -19,7 +19,7 @@ export function VideoUploader({ onFileSelect }: VideoUploaderProps) {
       return "Please upload an MP4 file";
     }
     if (file.size > MAX_FILE_SIZE) {
-      return "File size must be less than 50MB";
+      return "File size must be less than 100MB";
     }
     return null;
   };
@@ -100,7 +100,7 @@ export function VideoUploader({ onFileSelect }: VideoUploaderProps) {
           Drag and drop or click to browse
         </p>
         <p className="text-zinc-600 text-xs mt-1">
-          MP4 files only, max 50MB
+          MP4 files only, max 100MB
         </p>
 
         {error && (

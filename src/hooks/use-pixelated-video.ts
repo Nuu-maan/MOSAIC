@@ -7,29 +7,43 @@ export function usePixelatedVideo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
+  const pixelSizeRef = useRef(QUALITY_RANGE.default);
 
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [pixelSize, setPixelSize] = useState(QUALITY_RANGE.default);
+  const [pixelSize, setPixelSizeState] = useState(QUALITY_RANGE.default);
   const [quality, setQuality] = useState(qualityToPercentage(QUALITY_RANGE.default));
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
+  const setPixelSize = useCallback((value: number | ((prev: number) => number)) => {
+    setPixelSizeState((prev) => {
+      const newValue = typeof value === "function" ? value(prev) : value;
+      pixelSizeRef.current = newValue;
+      return newValue;
+    });
+  }, []);
+
   const renderFrame = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || video.paused || video.ended) return;
+    if (!video || !canvas) return;
+
+    if (video.paused || video.ended) {
+      animationRef.current = null;
+      return;
+    }
 
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    applyPixelation(ctx, video, canvas, pixelSize);
+    applyPixelation(ctx, video, canvas, pixelSizeRef.current);
     setCurrentTime(video.currentTime);
 
     animationRef.current = requestAnimationFrame(renderFrame);
-  }, [pixelSize]);
+  }, []);
 
   const loadVideo = useCallback((file: File) => {
     if (videoUrl) {
@@ -63,7 +77,9 @@ export function usePixelatedVideo() {
 
     video.play();
     setIsPlaying(true);
-    animationRef.current = requestAnimationFrame(renderFrame);
+    if (animationRef.current === null) {
+      animationRef.current = requestAnimationFrame(renderFrame);
+    }
   }, [renderFrame]);
 
   const pause = useCallback(() => {
@@ -74,6 +90,7 @@ export function usePixelatedVideo() {
     setIsPlaying(false);
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
   }, []);
 
@@ -99,7 +116,7 @@ export function usePixelatedVideo() {
       setQuality(qualityToPercentage(newSize));
       return newSize;
     });
-  }, []);
+  }, [setPixelSize]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
@@ -121,14 +138,9 @@ export function usePixelatedVideo() {
     setCurrentTime(0);
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
-  }, [videoUrl]);
-
-  useEffect(() => {
-    if (isPlaying && animationRef.current === null) {
-      animationRef.current = requestAnimationFrame(renderFrame);
-    }
-  }, [pixelSize, isPlaying, renderFrame]);
+  }, [videoUrl, setPixelSize]);
 
   useEffect(() => {
     return () => {

@@ -24,6 +24,101 @@ export const DEFAULT_OPTIONS: VideoOptions = {
   saturation: 100,
 };
 
+export interface Preset {
+  name: string;
+  icon: string;
+  options: Partial<VideoOptions>;
+}
+
+export const PRESETS: Preset[] = [
+  {
+    name: "Default",
+    icon: "sparkles",
+    options: { ...DEFAULT_OPTIONS },
+  },
+  {
+    name: "Retro 8-bit",
+    icon: "gamepad",
+    options: {
+      pixelSize: 20,
+      colorMode: "normal",
+      brightness: 110,
+      contrast: 120,
+      saturation: 120,
+    },
+  },
+  {
+    name: "Game Boy",
+    icon: "gamepad2",
+    options: {
+      pixelSize: 15,
+      colorMode: "custom",
+      customColor: "#9bbc0f",
+      brightness: 100,
+      contrast: 110,
+      saturation: 100,
+    },
+  },
+  {
+    name: "Noir",
+    icon: "film",
+    options: {
+      pixelSize: 4,
+      colorMode: "grayscale",
+      brightness: 90,
+      contrast: 130,
+      saturation: 0,
+    },
+  },
+  {
+    name: "Vintage",
+    icon: "camera",
+    options: {
+      pixelSize: 3,
+      colorMode: "sepia",
+      brightness: 95,
+      contrast: 90,
+      saturation: 80,
+    },
+  },
+  {
+    name: "Cyberpunk",
+    icon: "zap",
+    options: {
+      pixelSize: 8,
+      colorMode: "custom",
+      customColor: "#ff00ff",
+      brightness: 105,
+      contrast: 140,
+      saturation: 150,
+    },
+  },
+  {
+    name: "Matrix",
+    icon: "binary",
+    options: {
+      pixelSize: 6,
+      colorMode: "custom",
+      customColor: "#00ff00",
+      brightness: 85,
+      contrast: 150,
+      saturation: 100,
+    },
+  },
+  {
+    name: "Vaporwave",
+    icon: "sunset",
+    options: {
+      pixelSize: 12,
+      colorMode: "custom",
+      customColor: "#ff71ce",
+      brightness: 110,
+      contrast: 100,
+      saturation: 130,
+    },
+  },
+];
+
 export function calculatePixelSize(qualityLevel: number): number {
   return Math.max(QUALITY_RANGE.min, Math.min(QUALITY_RANGE.max, qualityLevel));
 }

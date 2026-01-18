@@ -1,30 +1,48 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { applyPixelation, QUALITY_RANGE, qualityToPercentage } from "@/lib/pixelation-engine";
+import {
+  applyPixelation,
+  QUALITY_RANGE,
+  qualityToPercentage,
+  DEFAULT_OPTIONS,
+  VideoOptions,
+  ColorMode,
+} from "@/lib/pixelation-engine";
 
 export function usePixelatedVideo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
-  const pixelSizeRef = useRef(QUALITY_RANGE.default);
+  const optionsRef = useRef<VideoOptions>({ ...DEFAULT_OPTIONS });
 
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [pixelSize, setPixelSizeState] = useState(QUALITY_RANGE.default);
+  const [options, setOptionsState] = useState<VideoOptions>({ ...DEFAULT_OPTIONS });
   const [quality, setQuality] = useState(qualityToPercentage(QUALITY_RANGE.default));
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  const setPixelSize = useCallback((value: number | ((prev: number) => number)) => {
-    setPixelSizeState((prev) => {
+  const setOptions = useCallback((value: VideoOptions | ((prev: VideoOptions) => VideoOptions)) => {
+    setOptionsState((prev) => {
       const newValue = typeof value === "function" ? value(prev) : value;
-      pixelSizeRef.current = newValue;
+      optionsRef.current = newValue;
       return newValue;
     });
   }, []);
+
+  const updateOption = useCallback(<K extends keyof VideoOptions>(key: K, value: VideoOptions[K]) => {
+    setOptions((prev) => {
+      const newOptions = { ...prev, [key]: value };
+      if (key === "pixelSize") {
+        setQuality(qualityToPercentage(value as number));
+      }
+      return newOptions;
+    });
+  }, [setOptions]);
 
   const renderFrame = useCallback(() => {
     const video = videoRef.current;
@@ -39,7 +57,7 @@ export function usePixelatedVideo() {
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    applyPixelation(ctx, video, canvas, pixelSizeRef.current);
+    applyPixelation(ctx, video, canvas, optionsRef.current);
     setCurrentTime(video.currentTime);
 
     animationRef.current = requestAnimationFrame(renderFrame);
@@ -111,18 +129,48 @@ export function usePixelatedVideo() {
   }, []);
 
   const updatePixelSize = useCallback((delta: number) => {
-    setPixelSize((prev) => {
-      const newSize = Math.max(QUALITY_RANGE.min, Math.min(QUALITY_RANGE.max, prev + delta));
+    setOptions((prev) => {
+      const newSize = Math.max(QUALITY_RANGE.min, Math.min(QUALITY_RANGE.max, prev.pixelSize + delta));
       setQuality(qualityToPercentage(newSize));
-      return newSize;
+      return { ...prev, pixelSize: newSize };
     });
-  }, [setPixelSize]);
+  }, [setOptions]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
+    if (!scrollEnabled) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? 2 : -2;
     updatePixelSize(delta);
-  }, [updatePixelSize]);
+  }, [updatePixelSize, scrollEnabled]);
+
+  const setColorMode = useCallback((mode: ColorMode) => {
+    updateOption("colorMode", mode);
+  }, [updateOption]);
+
+  const setCustomColor = useCallback((color: string) => {
+    updateOption("customColor", color);
+  }, [updateOption]);
+
+  const setBrightness = useCallback((value: number) => {
+    updateOption("brightness", value);
+  }, [updateOption]);
+
+  const setContrast = useCallback((value: number) => {
+    updateOption("contrast", value);
+  }, [updateOption]);
+
+  const setSaturation = useCallback((value: number) => {
+    updateOption("saturation", value);
+  }, [updateOption]);
+
+  const setPixelSize = useCallback((value: number) => {
+    updateOption("pixelSize", value);
+  }, [updateOption]);
+
+  const resetOptions = useCallback(() => {
+    setOptions({ ...DEFAULT_OPTIONS });
+    setQuality(qualityToPercentage(DEFAULT_OPTIONS.pixelSize));
+  }, [setOptions]);
 
   const reset = useCallback(() => {
     if (videoUrl) {
@@ -132,15 +180,15 @@ export function usePixelatedVideo() {
     setVideoUrl(null);
     setIsPlaying(false);
     setIsLoaded(false);
-    setPixelSize(QUALITY_RANGE.default);
-    setQuality(qualityToPercentage(QUALITY_RANGE.default));
+    setOptions({ ...DEFAULT_OPTIONS });
+    setQuality(qualityToPercentage(DEFAULT_OPTIONS.pixelSize));
     setDuration(0);
     setCurrentTime(0);
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-  }, [videoUrl, setPixelSize]);
+  }, [videoUrl, setOptions]);
 
   useEffect(() => {
     return () => {
@@ -160,10 +208,11 @@ export function usePixelatedVideo() {
     videoUrl,
     isPlaying,
     isLoaded,
-    pixelSize,
+    options,
     quality,
     duration,
     currentTime,
+    scrollEnabled,
     loadVideo,
     handleVideoLoad,
     play,
@@ -173,7 +222,15 @@ export function usePixelatedVideo() {
     updatePixelSize,
     handleWheel,
     reset,
+    resetOptions,
+    setOptions,
+    updateOption,
+    setColorMode,
+    setCustomColor,
+    setBrightness,
+    setContrast,
+    setSaturation,
     setPixelSize,
-    setQuality,
+    setScrollEnabled,
   };
 }

@@ -48,6 +48,11 @@ export default function Home() {
     isFullscreen,
     isExporting,
     exportProgress,
+    trimStart,
+    trimEnd,
+    exportFormat,
+    showComparison,
+    isPiPActive,
     loadVideo,
     handleVideoLoad,
     togglePlay,
@@ -73,6 +78,17 @@ export default function Home() {
     exportVideo,
     updatePixelSize,
     setOptions,
+    setRenderMode,
+    setAsciiDensity,
+    setAsciiFontSize,
+    setAsciiColor,
+    setAsciiBackground,
+    takeScreenshot,
+    setTrimStart,
+    setTrimEnd,
+    setExportFormat,
+    togglePiP,
+    toggleComparison,
   } = usePixelatedVideo();
 
   const [showControls, setShowControls] = useState(true);
@@ -428,31 +444,48 @@ export default function Home() {
                       <h2 className="text-sm font-medium">Video Controls</h2>
                     </div>
                     <VideoControls
-                      options={options}
-                      quality={quality}
-                      scrollEnabled={scrollEnabled}
-                      playbackSpeed={playbackSpeed}
-                      isLooping={isLooping}
-                      volume={volume}
-                      isMuted={isMuted}
-                      isExporting={isExporting}
-                      exportProgress={exportProgress}
-                      onPixelSizeChange={setPixelSize}
-                      onColorModeChange={setColorMode}
-                      onCustomColorChange={setCustomColor}
-                      onBrightnessChange={setBrightness}
-                      onContrastChange={setContrast}
-                      onSaturationChange={setSaturation}
-                      onScrollEnabledChange={setScrollEnabled}
-                      onPlaybackSpeedChange={setPlaybackSpeed}
-                      onLoopChange={setLooping}
-                      onVolumeChange={setVolume}
-                      onMuteToggle={toggleMute}
-                      onFullscreenToggle={toggleFullscreen}
-                      onExport={exportVideo}
-                      onPresetSelect={handlePresetSelect}
-                      onReset={resetOptions}
-                    />
+                        options={options}
+                        quality={quality}
+                        scrollEnabled={scrollEnabled}
+                        playbackSpeed={playbackSpeed}
+                        isLooping={isLooping}
+                        volume={volume}
+                        isMuted={isMuted}
+                        isExporting={isExporting}
+                        exportProgress={exportProgress}
+                        duration={duration}
+                        trimStart={trimStart}
+                        trimEnd={trimEnd}
+                        exportFormat={exportFormat}
+                        showComparison={showComparison}
+                        isPiPActive={isPiPActive}
+                        onPixelSizeChange={setPixelSize}
+                        onColorModeChange={setColorMode}
+                        onCustomColorChange={setCustomColor}
+                        onBrightnessChange={setBrightness}
+                        onContrastChange={setContrast}
+                        onSaturationChange={setSaturation}
+                        onScrollEnabledChange={setScrollEnabled}
+                        onPlaybackSpeedChange={setPlaybackSpeed}
+                        onLoopChange={setLooping}
+                        onVolumeChange={setVolume}
+                        onMuteToggle={toggleMute}
+                        onFullscreenToggle={toggleFullscreen}
+                        onExport={exportVideo}
+                        onPresetSelect={handlePresetSelect}
+                        onReset={resetOptions}
+                        onRenderModeChange={setRenderMode}
+                        onAsciiDensityChange={setAsciiDensity}
+                        onAsciiFontSizeChange={setAsciiFontSize}
+                        onAsciiColorChange={setAsciiColor}
+                        onAsciiBackgroundChange={setAsciiBackground}
+                        onScreenshot={takeScreenshot}
+                        onTrimStartChange={setTrimStart}
+                        onTrimEndChange={setTrimEnd}
+                        onExportFormatChange={setExportFormat}
+                        onPiPToggle={togglePiP}
+                        onComparisonToggle={toggleComparison}
+                      />
                   </div>
                 </div>
               )}

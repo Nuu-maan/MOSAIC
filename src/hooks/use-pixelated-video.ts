@@ -8,7 +8,19 @@ import {
   DEFAULT_OPTIONS,
   VideoOptions,
   ColorMode,
+  RenderMode,
+  AsciiDensity,
 } from "@/lib/pixelation-engine";
+import {
+  ExportFormat,
+  ExportOptions,
+  DEFAULT_EXPORT_OPTIONS,
+  captureScreenshot,
+  downloadBlob,
+  exportToGif,
+  exportToWebM,
+  exportToPngSequence,
+} from "@/lib/export-utils";
 
 export const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 export type PlaybackSpeed = (typeof PLAYBACK_SPEEDS)[number];
@@ -38,6 +50,12 @@ export function usePixelatedVideo() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('webm');
+  const [showComparison, setShowComparison] = useState(false);
+  const [comparisonPosition, setComparisonPosition] = useState(50);
+  const [isPiPActive, setIsPiPActive] = useState(false);
 
   const setOptions = useCallback((value: VideoOptions | ((prev: VideoOptions) => VideoOptions)) => {
     setOptionsState((prev) => {
@@ -95,6 +113,7 @@ export function usePixelatedVideo() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     setDuration(video.duration);
+    setTrimEnd(video.duration);
     setIsLoaded(true);
     video.loop = isLooping;
     video.playbackRate = playbackSpeed;
@@ -191,6 +210,26 @@ export function usePixelatedVideo() {
     updateOption("pixelSize", value);
   }, [updateOption]);
 
+  const setRenderMode = useCallback((mode: RenderMode) => {
+    updateOption("renderMode", mode);
+  }, [updateOption]);
+
+  const setAsciiDensity = useCallback((density: AsciiDensity) => {
+    updateOption("asciiDensity", density);
+  }, [updateOption]);
+
+  const setAsciiFontSize = useCallback((size: number) => {
+    updateOption("asciiFontSize", size);
+  }, [updateOption]);
+
+  const setAsciiColor = useCallback((color: string) => {
+    updateOption("asciiColor", color);
+  }, [updateOption]);
+
+  const setAsciiBackground = useCallback((color: string) => {
+    updateOption("asciiBackground", color);
+  }, [updateOption]);
+
   // Playback speed
   const setPlaybackSpeed = useCallback((speed: PlaybackSpeed) => {
     const video = videoRef.current;
@@ -270,84 +309,46 @@ export function usePixelatedVideo() {
   }, []);
 
   // Export video
-  const exportVideo = useCallback(async () => {
+  const exportVideo = useCallback(async (format?: ExportFormat) => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || isExporting) return;
 
+    const targetFormat = format || exportFormat;
     setIsExporting(true);
     setExportProgress(0);
 
     const wasPlaying = isPlaying;
     if (wasPlaying) pause();
 
+    const exportOpts: ExportOptions = {
+      format: targetFormat,
+      quality: 80,
+      fps: 30,
+      startTime: trimStart,
+      endTime: trimEnd || video.duration,
+    };
+
     try {
-      const stream = canvas.captureStream(30);
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
-        videoBitsPerSecond: 5000000,
-      });
-
-      const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
-
-      const exportPromise = new Promise<Blob>((resolve, reject) => {
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(chunks, { type: "video/webm" });
-          resolve(blob);
-        };
-        mediaRecorder.onerror = reject;
-      });
-
-      // Start recording
-      mediaRecorder.start();
-      video.currentTime = 0;
+      let blob: Blob;
+      const timestamp = Date.now();
       
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) throw new Error("Cannot get canvas context");
-
-      // Render each frame
-      const totalFrames = Math.ceil(video.duration * 30);
-      let frameCount = 0;
-
-      const renderExportFrame = () => {
-        return new Promise<void>((resolve) => {
-          const onSeeked = () => {
-            video.removeEventListener("seeked", onSeeked);
-            applyPixelation(ctx, video, canvas, optionsRef.current);
-            frameCount++;
-            setExportProgress(Math.round((frameCount / totalFrames) * 100));
-            resolve();
-          };
-          video.addEventListener("seeked", onSeeked);
-          video.currentTime = frameCount / 30;
-        });
-      };
-
-      for (let i = 0; i < totalFrames; i++) {
-        await renderExportFrame();
-        await new Promise((r) => setTimeout(r, 33)); // ~30fps timing
+      if (targetFormat === 'gif') {
+        blob = await exportToGif(video, canvas, optionsRef.current, exportOpts, setExportProgress);
+        downloadBlob(blob, `pixelated-video-${timestamp}.gif`);
+      } else if (targetFormat === 'png-sequence') {
+        const frames = await exportToPngSequence(video, canvas, optionsRef.current, exportOpts, setExportProgress);
+        for (let i = 0; i < frames.length; i++) {
+          downloadBlob(frames[i], `frame-${String(i).padStart(5, '0')}.png`);
+          await new Promise(r => setTimeout(r, 100));
+        }
+      } else {
+        blob = await exportToWebM(video, canvas, optionsRef.current, exportOpts, setExportProgress);
+        downloadBlob(blob, `pixelated-video-${timestamp}.webm`);
       }
 
-      mediaRecorder.stop();
-      const blob = await exportPromise;
-
-      // Download the file
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `pixelated-video-${Date.now()}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      video.currentTime = 0;
-      setCurrentTime(0);
+      video.currentTime = trimStart;
+      setCurrentTime(trimStart);
     } catch (err) {
       console.error("Export error:", err);
       alert("Export failed. Your browser may not support video recording.");
@@ -356,7 +357,51 @@ export function usePixelatedVideo() {
       setExportProgress(0);
       if (wasPlaying) play();
     }
-  }, [isPlaying, pause, play, isExporting]);
+  }, [isPlaying, pause, play, isExporting, exportFormat, trimStart, trimEnd]);
+
+  const takeScreenshot = useCallback(async (format: 'png' | 'jpg' = 'png') => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    try {
+      const blob = await captureScreenshot(canvas, format);
+      downloadBlob(blob, `screenshot-${Date.now()}.${format}`);
+    } catch (err) {
+      console.error("Screenshot error:", err);
+    }
+  }, []);
+
+  const togglePiP = useCallback(async () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPiPActive(false);
+      } else if (document.pictureInPictureEnabled) {
+        const pipVideo = document.createElement('video');
+        const stream = canvas.captureStream(30);
+        pipVideo.srcObject = stream;
+        pipVideo.muted = true;
+        await pipVideo.play();
+        await pipVideo.requestPictureInPicture();
+        setIsPiPActive(true);
+        
+        pipVideo.addEventListener('leavepictureinpicture', () => {
+          setIsPiPActive(false);
+          pipVideo.srcObject = null;
+        });
+      }
+    } catch (err) {
+      console.error("PiP error:", err);
+    }
+  }, []);
+
+  const toggleComparison = useCallback(() => {
+    setShowComparison(prev => !prev);
+  }, []);
 
   const resetOptions = useCallback(() => {
     setOptions({ ...DEFAULT_OPTIONS });
@@ -416,6 +461,12 @@ export function usePixelatedVideo() {
     isFullscreen,
     isExporting,
     exportProgress,
+    trimStart,
+    trimEnd,
+    exportFormat,
+    showComparison,
+    comparisonPosition,
+    isPiPActive,
     loadVideo,
     handleVideoLoad,
     play,
@@ -443,5 +494,17 @@ export function usePixelatedVideo() {
     toggleMute,
     toggleFullscreen,
     exportVideo,
+    setRenderMode,
+    setAsciiDensity,
+    setAsciiFontSize,
+    setAsciiColor,
+    setAsciiBackground,
+    takeScreenshot,
+    setTrimStart,
+    setTrimEnd,
+    setExportFormat,
+    togglePiP,
+    toggleComparison,
+    setComparisonPosition,
   };
 }

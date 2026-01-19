@@ -4,7 +4,9 @@ export const QUALITY_RANGE = {
   default: 10,
 } as const;
 
-export type ColorMode = "normal" | "grayscale" | "sepia" | "inverted" | "custom";
+export type ColorMode = "normal" | "grayscale" | "sepia" | "inverted" | "custom" | "duotone" | "posterize" | "vhs" | "crt";
+export type RenderMode = "pixel" | "ascii" | "edge";
+export type AsciiDensity = "dense" | "medium" | "light";
 
 export interface VideoOptions {
   pixelSize: number;
@@ -13,6 +15,18 @@ export interface VideoOptions {
   brightness: number;
   contrast: number;
   saturation: number;
+  renderMode: RenderMode;
+  asciiDensity: AsciiDensity;
+  asciiFontSize: number;
+  asciiColor: string;
+  asciiBackground: string;
+  blur: number;
+  sharpen: number;
+  duotoneColor1: string;
+  duotoneColor2: string;
+  posterizeLevels: number;
+  glitchIntensity: number;
+  scanlineIntensity: number;
 }
 
 export const DEFAULT_OPTIONS: VideoOptions = {
@@ -22,6 +36,24 @@ export const DEFAULT_OPTIONS: VideoOptions = {
   brightness: 100,
   contrast: 100,
   saturation: 100,
+  renderMode: "pixel",
+  asciiDensity: "medium",
+  asciiFontSize: 10,
+  asciiColor: "#00ff00",
+  asciiBackground: "#000000",
+  blur: 0,
+  sharpen: 0,
+  duotoneColor1: "#000000",
+  duotoneColor2: "#8b5cf6",
+  posterizeLevels: 4,
+  glitchIntensity: 0,
+  scanlineIntensity: 0,
+};
+
+export const ASCII_SETS: Record<AsciiDensity, string> = {
+  dense: "@%#*+=-:. ",
+  medium: "@#*+-. ",
+  light: "@*. ",
 };
 
 export interface Preset {
@@ -117,6 +149,17 @@ export const PRESETS: Preset[] = [
       saturation: 130,
     },
   },
+  {
+    name: "ASCII Art",
+    icon: "terminal",
+    options: {
+      renderMode: "ascii",
+      asciiDensity: "medium",
+      asciiFontSize: 10,
+      asciiColor: "#00ff00",
+      asciiBackground: "#000000",
+    },
+  },
 ];
 
 export function calculatePixelSize(qualityLevel: number): number {
@@ -144,40 +187,36 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
 
 export function applyColorFilter(
   imageData: ImageData,
-  colorMode: ColorMode,
-  customColor: string,
-  brightness: number,
-  contrast: number,
-  saturation: number
+  options: VideoOptions
 ): void {
+  const { colorMode, customColor, brightness, contrast, saturation, duotoneColor1, duotoneColor2, posterizeLevels, scanlineIntensity } = options;
   const data = imageData.data;
   const customRgb = hexToRgb(customColor);
+  const duotone1 = hexToRgb(duotoneColor1);
+  const duotone2 = hexToRgb(duotoneColor2);
   const brightnessFactor = brightness / 100;
   const contrastFactor = (contrast / 100) * 2;
   const saturationFactor = saturation / 100;
+  const width = imageData.width;
 
   for (let i = 0; i < data.length; i += 4) {
     let r = data[i];
     let g = data[i + 1];
     let b = data[i + 2];
 
-    // Apply brightness
     r = r * brightnessFactor;
     g = g * brightnessFactor;
     b = b * brightnessFactor;
 
-    // Apply contrast
     r = ((r / 255 - 0.5) * contrastFactor + 0.5) * 255;
     g = ((g / 255 - 0.5) * contrastFactor + 0.5) * 255;
     b = ((b / 255 - 0.5) * contrastFactor + 0.5) * 255;
 
-    // Apply saturation
     const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     r = gray + saturationFactor * (r - gray);
     g = gray + saturationFactor * (g - gray);
     b = gray + saturationFactor * (b - gray);
 
-    // Apply color mode
     switch (colorMode) {
       case "grayscale": {
         const avg = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -207,6 +246,48 @@ export function applyColorFilter(
         b = customRgb.b * factor;
         break;
       }
+      case "duotone": {
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        r = duotone1.r * (1 - lum) + duotone2.r * lum;
+        g = duotone1.g * (1 - lum) + duotone2.g * lum;
+        b = duotone1.b * (1 - lum) + duotone2.b * lum;
+        break;
+      }
+      case "posterize": {
+        const levels = posterizeLevels;
+        r = Math.round(r / 255 * (levels - 1)) / (levels - 1) * 255;
+        g = Math.round(g / 255 * (levels - 1)) / (levels - 1) * 255;
+        b = Math.round(b / 255 * (levels - 1)) / (levels - 1) * 255;
+        break;
+      }
+      case "vhs": {
+        const noise = (Math.random() - 0.5) * 30;
+        r = r + noise + 10;
+        g = g + noise;
+        b = b + noise - 5;
+        const pixelY = Math.floor((i / 4) / width);
+        if (pixelY % 3 === 0) {
+          r *= 0.95;
+          g *= 0.95;
+          b *= 0.95;
+        }
+        break;
+      }
+      case "crt": {
+        const pixelIndex = i / 4;
+        const x = pixelIndex % width;
+        const y = Math.floor(pixelIndex / width);
+        if (y % 2 === 0) {
+          r *= (1 - scanlineIntensity / 100 * 0.3);
+          g *= (1 - scanlineIntensity / 100 * 0.3);
+          b *= (1 - scanlineIntensity / 100 * 0.3);
+        }
+        const subpixel = x % 3;
+        if (subpixel === 0) { g *= 0.9; b *= 0.8; }
+        else if (subpixel === 1) { r *= 0.9; b *= 0.8; }
+        else { r *= 0.8; g *= 0.9; }
+        break;
+      }
     }
 
     data[i] = Math.max(0, Math.min(255, r));
@@ -223,15 +304,31 @@ export function applyPixelation(
 ): void {
   const w = canvas.width;
   const h = canvas.height;
-  const { pixelSize, colorMode, customColor, brightness, contrast, saturation } = options;
+  const { pixelSize, colorMode, brightness, contrast, saturation, renderMode, blur } = options;
+
+  if (renderMode === "ascii") {
+    applyAsciiArt(ctx, video, canvas, options);
+    return;
+  }
+
+  if (renderMode === "edge") {
+    applyEdgeDetection(ctx, video, canvas, options);
+    return;
+  }
 
   if (pixelSize <= 1) {
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(video, 0, 0, w, h);
     
+    if (blur > 0) {
+      ctx.filter = `blur(${blur}px)`;
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+    }
+    
     if (colorMode !== "normal" || brightness !== 100 || contrast !== 100 || saturation !== 100) {
       const imageData = ctx.getImageData(0, 0, w, h);
-      applyColorFilter(imageData, colorMode, customColor, brightness, contrast, saturation);
+      applyColorFilter(imageData, options);
       ctx.putImageData(imageData, 0, 0);
     }
     return;
@@ -243,15 +340,131 @@ export function applyPixelation(
   ctx.imageSmoothingEnabled = true;
   ctx.drawImage(video, 0, 0, scaledW, scaledH);
 
-  // Apply color filter to the small version for better performance
   if (colorMode !== "normal" || brightness !== 100 || contrast !== 100 || saturation !== 100) {
     const imageData = ctx.getImageData(0, 0, scaledW, scaledH);
-    applyColorFilter(imageData, colorMode, customColor, brightness, contrast, saturation);
+    applyColorFilter(imageData, options);
     ctx.putImageData(imageData, 0, 0);
   }
 
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(canvas, 0, 0, scaledW, scaledH, 0, 0, w, h);
+}
+
+function applyEdgeDetection(
+  ctx: CanvasRenderingContext2D,
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  options: VideoOptions
+): void {
+  const w = canvas.width;
+  const h = canvas.height;
+  
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(video, 0, 0, w, h);
+  
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const data = imageData.data;
+  const output = new Uint8ClampedArray(data.length);
+  
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const idx = (y * w + x) * 4;
+      
+      const getGray = (ox: number, oy: number) => {
+        const i = ((y + oy) * w + (x + ox)) * 4;
+        return 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      };
+      
+      const gx = 
+        -1 * getGray(-1, -1) + 1 * getGray(1, -1) +
+        -2 * getGray(-1, 0) + 2 * getGray(1, 0) +
+        -1 * getGray(-1, 1) + 1 * getGray(1, 1);
+        
+      const gy = 
+        -1 * getGray(-1, -1) - 2 * getGray(0, -1) - 1 * getGray(1, -1) +
+        1 * getGray(-1, 1) + 2 * getGray(0, 1) + 1 * getGray(1, 1);
+      
+      const magnitude = Math.min(255, Math.sqrt(gx * gx + gy * gy));
+      
+      output[idx] = magnitude;
+      output[idx + 1] = magnitude;
+      output[idx + 2] = magnitude;
+      output[idx + 3] = 255;
+    }
+  }
+  
+  const outputData = new ImageData(output, w, h);
+  ctx.putImageData(outputData, 0, 0);
+}
+
+function getPixelBrightness(r: number, g: number, b: number): number {
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function mapBrightnessToChar(brightness: number, charSet: string): string {
+  const index = Math.floor((1 - brightness) * (charSet.length - 1));
+  return charSet[Math.min(index, charSet.length - 1)];
+}
+
+export function applyAsciiArt(
+  ctx: CanvasRenderingContext2D,
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  options: VideoOptions
+): void {
+  const { asciiDensity, asciiFontSize, asciiColor, asciiBackground, brightness, contrast } = options;
+  const charSet = ASCII_SETS[asciiDensity];
+  
+  const w = canvas.width;
+  const h = canvas.height;
+  
+  const fontSize = Math.max(4, asciiFontSize);
+  const charWidth = fontSize * 0.6;
+  const charHeight = fontSize;
+  
+  const cols = Math.floor(w / charWidth);
+  const rows = Math.floor(h / charHeight);
+  
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(video, 0, 0, cols, rows);
+  const imageData = ctx.getImageData(0, 0, cols, rows);
+  const data = imageData.data;
+  
+  ctx.fillStyle = asciiBackground;
+  ctx.fillRect(0, 0, w, h);
+  
+  ctx.font = `${fontSize}px monospace`;
+  ctx.fillStyle = asciiColor;
+  ctx.textBaseline = "top";
+  
+  const brightnessFactor = brightness / 100;
+  const contrastFactor = (contrast / 100) * 2;
+  
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const i = (y * cols + x) * 4;
+      let r = data[i];
+      let g = data[i + 1];
+      let b = data[i + 2];
+      
+      r = r * brightnessFactor;
+      g = g * brightnessFactor;
+      b = b * brightnessFactor;
+      
+      r = ((r / 255 - 0.5) * contrastFactor + 0.5) * 255;
+      g = ((g / 255 - 0.5) * contrastFactor + 0.5) * 255;
+      b = ((b / 255 - 0.5) * contrastFactor + 0.5) * 255;
+      
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+      
+      const pixelBrightness = getPixelBrightness(r, g, b);
+      const char = mapBrightnessToChar(pixelBrightness, charSet);
+      
+      ctx.fillText(char, x * charWidth, y * charHeight);
+    }
+  }
 }
 
 export function getQualityLabel(percentage: number): string {

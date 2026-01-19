@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MOSAIC
+
+A real-time video pixelation and effects tool that runs entirely in your browser.
+
+**Live Demo:** [mosaic.nuu-maan.com](https://mosaic.nuu-maan.com)
+
+## Features
+
+- **Scroll-Controlled Pixelation** — Use your scroll wheel to dynamically adjust video quality
+- **Multiple Render Modes** — Pixel blocks, ASCII art, and more
+- **Real-Time Processing** — 60fps smooth playback with instant effect updates
+- **Color Modes** — Original, grayscale, sepia, inverted, and custom color overlays
+- **Export Options** — Save processed videos as WebM or GIF
+- **Screenshot Capture** — Export single frames as PNG
+- **Keyboard Shortcuts** — Full keyboard control for power users
+- **Privacy First** — All processing happens client-side; your videos never leave your browser
+
+## Tech Stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- Canvas API
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+# Install dependencies
+bun install
+
+# Run development server
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Upload an MP4 video (max 100MB)
+2. Scroll over the video to adjust pixelation level
+3. Use the control panel to adjust colors, brightness, contrast, and more
+4. Export your creation as WebM, GIF, or PNG screenshot
 
-## Learn More
+## Keyboard Shortcuts
 
-To learn more about Next.js, take a look at the following resources:
+| Key | Action |
+|-----|--------|
+| `Space` | Play/Pause |
+| `←` / `→` | Seek -5s / +5s |
+| `↑` / `↓` | Increase / Decrease pixel size |
+| `M` | Toggle mute |
+| `L` | Toggle loop |
+| `F` | Toggle fullscreen |
+| `R` | Reset effects |
+| `?` | Show shortcuts |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

@@ -141,7 +141,7 @@ export function VideoUploader({ onFileSelect, onUrlLoad }: VideoUploaderProps) {
             {isDragging ? (
               <Film className="w-12 h-12 text-purple-400" />
             ) : (
-              <Upload className="w-12 h-12 text-zinc-400 group-hover:text-purple-400 transition-colors duration-200" />
+              <Upload className="w-12 h-12 text-zinc-300 group-hover:text-purple-400 transition-colors duration-200" />
             )}
           </div>
 
@@ -149,10 +149,10 @@ export function VideoUploader({ onFileSelect, onUrlLoad }: VideoUploaderProps) {
             {isDragging ? "Drop your video here" : "Upload Video"}
           </h3>
           
-          <p className="text-zinc-500 text-sm text-center">
+          <p className="text-zinc-300 text-sm text-center">
             Drag and drop or click to browse
           </p>
-          <p className="text-zinc-600 text-xs mt-1">
+          <p className="text-zinc-500 text-xs mt-1">
             MP4, WebM, MOV, AVI, MKV - max 100MB
           </p>
         </label>
@@ -160,14 +160,14 @@ export function VideoUploader({ onFileSelect, onUrlLoad }: VideoUploaderProps) {
 
       <div className="flex items-center gap-4">
         <div className="flex-1 h-px bg-zinc-800" />
-        <span className="text-xs text-zinc-500">or</span>
+        <span className="text-xs text-zinc-400">or</span>
         <div className="flex-1 h-px bg-zinc-800" />
       </div>
 
       {!showUrlInput ? (
         <Button
           variant="outline"
-          className="w-full text-zinc-400 border-zinc-700 hover:bg-zinc-800 hover:text-zinc-200"
+          className="w-full text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
           onClick={() => setShowUrlInput(true)}
         >
           <Link className="w-4 h-4 mr-2" />
@@ -203,7 +203,7 @@ export function VideoUploader({ onFileSelect, onUrlLoad }: VideoUploaderProps) {
               setUrlInput("");
               setError(null);
             }}
-            className="text-xs text-zinc-500 hover:text-zinc-400 transition-colors"
+            className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
           >
             Cancel
           </button>

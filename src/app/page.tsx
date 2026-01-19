@@ -145,7 +145,7 @@ export default function Home() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowShortcuts(false)}
-                className="text-zinc-400 hover:text-zinc-100"
+                className="text-zinc-300 hover:text-zinc-100"
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -156,7 +156,7 @@ export default function Home() {
                   key={shortcut.key}
                   className="flex items-center justify-between py-2 border-b border-zinc-800 last:border-0"
                 >
-                  <span className="text-zinc-400">{shortcut.description}</span>
+                  <span className="text-zinc-300">{shortcut.description}</span>
                   <kbd className="px-2 py-1 bg-zinc-800 rounded text-xs font-mono text-purple-400">
                     {shortcut.key}
                   </kbd>
@@ -187,7 +187,7 @@ export default function Home() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowShortcuts(true)}
-                  className="text-zinc-400 hover:text-zinc-100"
+                  className="text-zinc-300 hover:text-zinc-100"
                 >
                   <Keyboard className="w-4 h-4 mr-2" />
                   Shortcuts
@@ -209,7 +209,7 @@ export default function Home() {
                   Dynamic video
                   <span className="text-purple-400"> pixelation</span>
                 </h2>
-                <p className="text-zinc-400">
+                <p className="text-zinc-300">
                   Upload any MP4 video and control the pixelation with your scroll wheel.
                   Scroll up for better quality, scroll down for more pixelation.
                 </p>
@@ -234,7 +234,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-zinc-500 text-sm mt-4">
+              <div className="flex items-center gap-2 text-zinc-400 text-sm mt-4">
                 <Mouse className="w-4 h-4" />
                 <span>Scroll wheel controls quality over the video</span>
               </div>
@@ -246,7 +246,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                    <span className="text-sm text-zinc-400 font-mono truncate max-w-xs">
+                    <span className="text-sm text-zinc-300 font-mono truncate max-w-xs">
                       {videoFile.name}
                     </span>
                     {playbackSpeed !== 1 && (
@@ -263,7 +263,7 @@ export default function Home() {
                       size="sm"
                       variant="ghost"
                       onClick={() => setShowControls(!showControls)}
-                      className="text-zinc-400 hover:text-zinc-100 lg:hidden"
+                      className="text-zinc-300 hover:text-zinc-100 lg:hidden"
                     >
                       <Settings2 className="h-4 w-4" />
                     </Button>
@@ -271,7 +271,7 @@ export default function Home() {
                       size="sm"
                       variant="ghost"
                       onClick={reset}
-                      className="text-zinc-400 hover:text-zinc-100"
+                      className="text-zinc-300 hover:text-zinc-100"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       New Video
@@ -295,7 +295,7 @@ export default function Home() {
                     <QualityIndicator quality={quality} pixelSize={options.pixelSize} />
                   )}
                   {isLoaded && scrollEnabled && !isFullscreen && (
-                    <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs text-zinc-400 flex items-center gap-2">
+                    <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs text-zinc-300 flex items-center gap-2">
                       <Mouse className="w-3 h-3" />
                       Scroll to adjust quality
                     </div>
@@ -326,14 +326,14 @@ export default function Home() {
                             className="cursor-pointer"
                           />
                         </div>
-                        <span className="text-xs text-zinc-400 font-mono">
+                        <span className="text-xs text-zinc-300 font-mono">
                           {formatTime(currentTime)} / {formatTime(duration)}
                         </span>
                         <Button
                           size="icon"
                           variant="ghost"
                           onClick={toggleMute}
-                          className="text-zinc-400 hover:text-zinc-100"
+                          className="text-zinc-300 hover:text-zinc-100"
                         >
                           {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                         </Button>
@@ -341,7 +341,7 @@ export default function Home() {
                           size="icon"
                           variant="ghost"
                           onClick={toggleFullscreen}
-                          className="text-zinc-400 hover:text-zinc-100"
+                          className="text-zinc-300 hover:text-zinc-100"
                         >
                           <Minimize className="h-4 w-4" />
                         </Button>
@@ -377,7 +377,7 @@ export default function Home() {
                           disabled={!isLoaded}
                           className="cursor-pointer"
                         />
-                        <div className="flex justify-between text-xs text-zinc-500">
+                        <div className="flex justify-between text-xs text-zinc-400">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
@@ -389,7 +389,7 @@ export default function Home() {
                           size="icon"
                           variant="ghost"
                           onClick={toggleMute}
-                          className="text-zinc-400 hover:text-zinc-100 h-8 w-8"
+                          className="text-zinc-300 hover:text-zinc-100 h-8 w-8"
                         >
                           {isMuted || volume === 0 ? (
                             <VolumeX className="h-4 w-4" />
@@ -413,7 +413,7 @@ export default function Home() {
                         size="icon"
                         variant="ghost"
                         onClick={toggleLoop}
-                        className={`h-8 w-8 ${isLooping ? "text-purple-400" : "text-zinc-400"} hover:text-zinc-100`}
+                        className={`h-8 w-8 ${isLooping ? "text-purple-400" : "text-zinc-300"} hover:text-zinc-100`}
                       >
                         <Repeat className="h-4 w-4" />
                       </Button>
@@ -422,7 +422,7 @@ export default function Home() {
                         size="icon"
                         variant="ghost"
                         onClick={toggleFullscreen}
-                        className="text-zinc-400 hover:text-zinc-100 h-8 w-8"
+                        className="text-zinc-300 hover:text-zinc-100 h-8 w-8"
                       >
                         <Maximize className="h-4 w-4" />
                       </Button>
@@ -496,13 +496,13 @@ export default function Home() {
         <footer className="border-t border-zinc-800/50 mt-auto">
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-zinc-600 font-mono">
+              <p className="text-xs text-zinc-500 font-mono">
                 Client-side processing only. Your videos never leave your browser.
               </p>
               {isLoaded && (
                 <button
                   onClick={() => setShowShortcuts(true)}
-                  className="text-xs text-zinc-600 hover:text-zinc-400 flex items-center gap-1"
+                  className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1"
                 >
                   <Keyboard className="w-3 h-3" />
                   Press ? for shortcuts

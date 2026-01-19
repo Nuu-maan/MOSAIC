@@ -195,7 +195,7 @@ export function VideoControls({
               <button
                 key={preset.name}
                 onClick={() => onPresetSelect(preset.options)}
-                className="flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 transition-colors text-left"
+                className="flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors text-left"
               >
                 {PRESET_ICONS[preset.icon]}
                 {preset.name}
@@ -218,7 +218,7 @@ export function VideoControls({
                 className={`flex-1 px-3 py-2 text-xs rounded-md transition-colors ${
                   options.renderMode === mode.value
                     ? "bg-purple-500 text-white"
-                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                 }`}
               >
                 {mode.label}
@@ -238,7 +238,7 @@ export function VideoControls({
               
               {/* ASCII Density */}
               <div className="space-y-2">
-                <Label className="text-xs text-zinc-400">Character Density</Label>
+                <Label className="text-xs text-zinc-300">Character Density</Label>
                 <div className="flex gap-1">
                   {ASCII_DENSITIES.map((density) => (
                     <button
@@ -247,7 +247,7 @@ export function VideoControls({
                       className={`flex-1 px-2 py-1.5 text-xs rounded transition-colors ${
                         options.asciiDensity === density.value
                           ? "bg-green-500 text-white"
-                          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                          : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                       }`}
                     >
                       {density.label}
@@ -259,8 +259,8 @@ export function VideoControls({
               {/* ASCII Font Size */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs text-zinc-400">Font Size</Label>
-                  <span className="text-xs text-zinc-400 font-mono">{options.asciiFontSize}px</span>
+                  <Label className="text-xs text-zinc-300">Font Size</Label>
+                  <span className="text-xs text-zinc-300 font-mono">{options.asciiFontSize}px</span>
                 </div>
                 <Slider
                   value={[options.asciiFontSize]}
@@ -274,7 +274,7 @@ export function VideoControls({
 
               {/* ASCII Colors */}
               <div className="space-y-2">
-                <Label className="text-xs text-zinc-400">Text Color</Label>
+                <Label className="text-xs text-zinc-300">Text Color</Label>
                 <div className="flex gap-2 flex-wrap">
                   {[
                     { name: "Green", color: "#00ff00" },
@@ -308,7 +308,7 @@ export function VideoControls({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs text-zinc-400">Background Color</Label>
+                <Label className="text-xs text-zinc-300">Background Color</Label>
                 <div className="flex gap-2 flex-wrap">
                   {[
                     { name: "Black", color: "#000000" },
@@ -351,7 +351,7 @@ export function VideoControls({
                 <Grid3X3 className="w-4 h-4 text-purple-400" />
                 <Label className="text-sm font-medium">Pixelation</Label>
               </div>
-              <span className="text-xs text-zinc-400 font-mono">
+              <span className="text-xs text-zinc-300 font-mono">
                 {options.pixelSize}px ({quality}%)
               </span>
             </div>
@@ -399,7 +399,7 @@ export function VideoControls({
               className={`px-2 py-1 text-xs rounded transition-colors ${
                 playbackSpeed === speed
                   ? "bg-purple-500 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               }`}
             >
               {speed}x
@@ -427,7 +427,7 @@ export function VideoControls({
       <div className="space-y-3 pt-2 border-t border-zinc-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={onMuteToggle} className="text-zinc-400 hover:text-zinc-200">
+            <button onClick={onMuteToggle} className="text-zinc-400 hover:text-zinc-100">
               {isMuted || volume === 0 ? (
                 <VolumeX className="w-4 h-4" />
               ) : (
@@ -436,7 +436,7 @@ export function VideoControls({
             </button>
             <Label className="text-sm">Volume</Label>
           </div>
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs text-zinc-300 font-mono">
             {isMuted ? "Muted" : `${Math.round(volume * 100)}%`}
           </span>
         </div>
@@ -465,7 +465,7 @@ export function VideoControls({
               className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
                 options.colorMode === mode.value
                   ? "bg-purple-500 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
               }`}
             >
               {mode.label}
@@ -477,7 +477,7 @@ export function VideoControls({
       {/* Custom Color Picker */}
       {options.colorMode === "custom" && (
         <div className="space-y-3">
-          <Label className="text-sm text-zinc-400">Custom Color</Label>
+          <Label className="text-sm text-zinc-300">Custom Color</Label>
           <div className="flex gap-2 flex-wrap">
             {COLOR_PRESETS.map((preset) => (
               <button
@@ -512,7 +512,7 @@ export function VideoControls({
             <Sun className="w-4 h-4 text-yellow-400" />
             <Label className="text-sm">Brightness</Label>
           </div>
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs text-zinc-300 font-mono">
             {options.brightness}%
           </span>
         </div>
@@ -533,7 +533,7 @@ export function VideoControls({
             <Contrast className="w-4 h-4 text-blue-400" />
             <Label className="text-sm">Contrast</Label>
           </div>
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs text-zinc-300 font-mono">
             {options.contrast}%
           </span>
         </div>
@@ -554,7 +554,7 @@ export function VideoControls({
             <Droplets className="w-4 h-4 text-cyan-400" />
             <Label className="text-sm">Saturation</Label>
           </div>
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs text-zinc-300 font-mono">
             {options.saturation}%
           </span>
         </div>
@@ -577,7 +577,7 @@ export function VideoControls({
               <Label className="text-sm font-medium">Trim Selection</Label>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
+              <div className="flex items-center justify-between text-xs text-zinc-300">
                 <span>Start: {formatTime(trimStart)}</span>
                 <span>End: {formatTime(trimEnd)}</span>
               </div>
@@ -608,7 +608,7 @@ export function VideoControls({
 
           {/* Export Format */}
           <div className="space-y-2">
-            <Label className="text-xs text-zinc-400">Export Format</Label>
+            <Label className="text-xs text-zinc-300">Export Format</Label>
             <div className="flex gap-1">
               {EXPORT_FORMATS.map((format) => (
                 <button
@@ -617,7 +617,7 @@ export function VideoControls({
                   className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded transition-colors ${
                     exportFormat === format.value
                       ? "bg-purple-500 text-white"
-                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   }`}
                 >
                   {format.icon}
@@ -633,7 +633,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={() => onScreenshot('png')}
-              className="text-zinc-400 border-zinc-700 hover:bg-zinc-800"
+              className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
             >
               <Camera className="w-4 h-4 mr-2" />
               Screenshot
@@ -642,7 +642,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onPiPToggle}
-              className={`border-zinc-700 hover:bg-zinc-800 ${isPiPActive ? 'text-purple-400' : 'text-zinc-400'}`}
+              className={`border-zinc-700 hover:bg-zinc-800 hover:text-white ${isPiPActive ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-300'}`}
             >
               <PictureInPicture2 className="w-4 h-4 mr-2" />
               PiP
@@ -654,7 +654,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onFullscreenToggle}
-              className="text-zinc-400 border-zinc-700 hover:bg-zinc-800"
+              className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
             >
               <Maximize className="w-4 h-4 mr-2" />
               Fullscreen
@@ -663,7 +663,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onComparisonToggle}
-              className={`border-zinc-700 hover:bg-zinc-800 ${showComparison ? 'text-purple-400' : 'text-zinc-400'}`}
+              className={`border-zinc-700 hover:bg-zinc-800 hover:text-white ${showComparison ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-300'}`}
             >
               <SplitSquareHorizontal className="w-4 h-4 mr-2" />
               Compare
@@ -695,12 +695,12 @@ export function VideoControls({
             variant="outline"
             size="sm"
             onClick={onReset}
-            className="w-full text-zinc-400 border-zinc-700 hover:bg-zinc-800"
+            className="w-full text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset All Settings
           </Button>
         </div>
       </div>
-    );
-  }
+  );
+}

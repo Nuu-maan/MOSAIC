@@ -633,7 +633,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={() => onScreenshot('png')}
-              className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+              className="text-zinc-100 border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:text-white"
             >
               <Camera className="w-4 h-4 mr-2" />
               Screenshot
@@ -642,7 +642,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onPiPToggle}
-              className={`border-zinc-700 hover:bg-zinc-800 hover:text-white ${isPiPActive ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-300'}`}
+              className={`border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:text-white ${isPiPActive ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-100'}`}
             >
               <PictureInPicture2 className="w-4 h-4 mr-2" />
               PiP
@@ -654,7 +654,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onFullscreenToggle}
-              className="text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+              className="text-zinc-100 border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:text-white"
             >
               <Maximize className="w-4 h-4 mr-2" />
               Fullscreen
@@ -663,7 +663,7 @@ export function VideoControls({
               variant="outline"
               size="sm"
               onClick={onComparisonToggle}
-              className={`border-zinc-700 hover:bg-zinc-800 hover:text-white ${showComparison ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-300'}`}
+              className={`border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:text-white ${showComparison ? 'text-purple-400 hover:text-purple-300' : 'text-zinc-100'}`}
             >
               <SplitSquareHorizontal className="w-4 h-4 mr-2" />
               Compare
@@ -676,7 +676,7 @@ export function VideoControls({
             size="sm"
             onClick={() => onExport(exportFormat)}
             disabled={isExporting}
-            className="w-full bg-purple-500 hover:bg-purple-400 text-white"
+            className="w-full bg-purple-500 hover:bg-purple-400 text-white font-medium"
           >
             {isExporting ? (
               <>
@@ -695,7 +695,7 @@ export function VideoControls({
             variant="outline"
             size="sm"
             onClick={onReset}
-            className="w-full text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+            className="w-full text-zinc-100 border-zinc-600 bg-zinc-800 hover:bg-zinc-700 hover:text-white"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset All Settings

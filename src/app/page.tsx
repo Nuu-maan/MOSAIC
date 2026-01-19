@@ -177,9 +177,9 @@ export default function Home() {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold tracking-tight font-mono">
-                    PIXEL<span className="text-purple-400">_</span>VIDEO
+                    MOSAIC
                   </h1>
-                  <p className="text-xs text-zinc-500">Scroll-controlled pixelation</p>
+                  <p className="text-xs text-zinc-500">Dynamic video effects</p>
                 </div>
               </div>
               {isLoaded && (
